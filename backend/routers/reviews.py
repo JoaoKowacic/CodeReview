@@ -1,11 +1,13 @@
 from fastapi import HTTPException, Query, Path, Depends, BackgroundTasks, Request, APIRouter
-from motor.motor_asyncio import AsyncIOMotorCollection
+from fastapi import Request
+from pymongo.asynchronous.collection import AsyncCollection
 from typing import Optional, List,  Dict, Any
 from pydantic import BaseModel, Field
 from datetime import datetime
 from bson import ObjectId
-from ..dependencies import get_token_header
+from ..dependencies.token import get_token_header
 from ..database.mongodb import get_reviews_collection, reviews_collection
+from ..dependencies.limiter import limiter
 from enum import Enum
 import uuid
 import asyncio
@@ -168,12 +170,12 @@ async def process_review_background(review_id: str, code: str, language: str):
         )
 
 @router.post("/", response_model=CodeReview)
-# @limiter.limit("10/hour")
+@limiter.limit("10/hour")  # type: ignore
 async def submit_review(
     request: Request,
     background_tasks: BackgroundTasks,
     review_request: SubmitReviewRequest,
-    collection: AsyncIOMotorCollection[Dict[str, Any]] = Depends(get_reviews_collection)
+    collection: AsyncCollection[Dict[str, Any]] = Depends(get_reviews_collection)
 ):
     """
     Submit code for review
@@ -204,7 +206,7 @@ async def submit_review(
 @router.get("/{id}", response_model=CodeReview)
 async def get_review(
     id: str = Path(..., description="The ID of the review to retrieve"),
-    collection: AsyncIOMotorCollection[Dict[str, Any]]= Depends(get_reviews_collection)
+    collection: AsyncCollection[Dict[str, Any]]= Depends(get_reviews_collection)
 ):
     """
     Get specific review by ID
@@ -221,7 +223,7 @@ async def list_reviews(
     limit: int = Query(10, ge=1, le=100, description="Number of items to return"),
     status: Optional[ReviewStatus] = Query(None, description="Filter by review status"),
     language: Optional[ProgrammingLanguage] = Query(None, description="Filter by programming language"),
-    collection: AsyncIOMotorCollection[Dict[str, Any]] = Depends(get_reviews_collection)
+    collection: AsyncCollection[Dict[str, Any]] = Depends(get_reviews_collection)
 ):
     """
     List reviews with pagination and filters
