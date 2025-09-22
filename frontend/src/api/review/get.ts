@@ -10,7 +10,7 @@ export interface Review {
   language: string
   status: ReviewStatus
   submitted_at: string
-  started_at: null | string
+  started_at: string
   completed_at: null | string
   result: null | {
     feedback: [
@@ -33,6 +33,6 @@ export async function getReview(id: string): Promise<Review> {
       'x-token': env.VITE_TOKEN,
     },
   })
-  console.log(response)
+
   return response.data
 }
