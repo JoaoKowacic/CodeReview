@@ -3,7 +3,7 @@ from fastapi import Depends
 import openai
 from ..database.mongodb import get_reviews_collection
 from fastapi import APIRouter, Depends
-from ..dependencies import get_token_header
+from ..dependencies.token import get_token_header
 from pymongo.asynchronous.collection import AsyncCollection
 from typing import Any
 

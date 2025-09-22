@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from slowapi import Limiter
-from slowapi.util import get_remote_address
+from .dependencies.limiter import limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from .routers import health, reviews, stats
@@ -22,11 +21,10 @@ app.add_middleware(
 async def root():
     return {"message": "AI Code Review Service API", "version": "1.0.0"}
 
-limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(
     status_code=429, content={"detail": "Rate limit exceeded"}
 ))
+app.state.limiter = limiter
 app.add_middleware(SlowAPIMiddleware)
 app.include_router(health.router)
 app.include_router(reviews.router)
