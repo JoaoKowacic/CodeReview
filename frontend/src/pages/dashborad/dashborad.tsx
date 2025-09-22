@@ -17,7 +17,6 @@ import { getAllReviews } from '@/api/review/get-all';
 
 export function AnalyticsDashboard() {
   const [reviews, setReviews] = useState<Review[]>([]);
-  
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [healthStatus, setHealthStatus] = useState<HealthCheckResponse | null>(null);
@@ -36,7 +35,6 @@ export function AnalyticsDashboard() {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      // Load all data in parallel
       const [reviewsData, statsData, healthData] = await Promise.all([
         getAllReviews(),
         getStats(),
@@ -47,10 +45,8 @@ export function AnalyticsDashboard() {
       setStats(statsData);
       setHealthStatus(healthData);
 
-      // Apply filters to reviews
       let filteredReviews = reviewsData;
       
-      // Filter by language
       if (filters.language !== 'all') {
         filteredReviews = filteredReviews.filter(review => 
           review.language?.toLowerCase() === filters.language.toLowerCase()
@@ -76,10 +72,8 @@ export function AnalyticsDashboard() {
 
   const handleExport = async () => {
     try {
-      // Create CSV data from filtered reviews
       const csvData = convertReviewsToCSV(reviews);
       
-      // Create download link
       const blob = new Blob([csvData], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -123,7 +117,6 @@ export function AnalyticsDashboard() {
     }).format(date);
   };
 
-  // Calculate common issues from reviews
   const getCommonIssues = () => {
     const issueCount: Record<string, number> = {};
     
@@ -140,7 +133,7 @@ export function AnalyticsDashboard() {
     return Object.entries(issueCount)
       .map(([issue, count]) => ({ issue, count }))
       .sort((a, b) => b.count - a.count)
-      .slice(0, 5); // Top 5 issues
+      .slice(0, 5); 
   };
 
   const commonIssues = getCommonIssues();
@@ -207,8 +200,7 @@ export function AnalyticsDashboard() {
               </label>
               <DatePickerWithRange
                 date={filters.dateRange}
-                // setDate={setFilters}
-                // onChange={(range) => handleFilterChange('dateRange', range)}
+                onChange={(range) => handleFilterChange('dateRange', range)}
               />
             </div>
           </div>
