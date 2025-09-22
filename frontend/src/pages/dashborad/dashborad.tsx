@@ -23,7 +23,7 @@ export function AnalyticsDashboard() {
   const [filters, setFilters] = useState({
     language: 'all',
     dateRange: {
-      from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Default to last 30 days
+      from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
       to: new Date(),
     },
   });
