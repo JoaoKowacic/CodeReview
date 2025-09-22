@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ArrowUp, Loader2, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Combobox } from '@/components/ui/combobox';
 import { createReview } from '@/api/review/post';
-import { toast } from "sonner"
+import { toast, Toaster } from "sonner"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CodeBlock } from '@/components/ui/codeblock';
 import { getReview, type Review, type ReviewStatus } from '@/api/review/get';
@@ -68,7 +68,7 @@ export function CodeTextarea() {
             }
             return;
           } else if (review.status === 'failed') {
-            setError(review.error_message || 'Review failed');
+            setError(review.error_message || 'Rate limit exceeded, wait one hour');
             toast("There was an error reviewing your code.");
             return;
           }
@@ -104,7 +104,7 @@ export function CodeTextarea() {
   } catch (error) {
     console.error('Failed to create review:', error);
     setReviewStatus('failed');
-    setError('Failed to submit code for review. Please try again.');
+    setError('Failed to submit code for review. Rate limit exceeded, please wait one hour.');
     toast("There was an error submitting your code for review.");
   } finally {
     setIsLoading(false);
@@ -148,20 +148,20 @@ export function CodeTextarea() {
     }
   };
 
-  const getStatusText = () => {
-    switch (reviewStatus) {
-      case 'pending':
-        return 'Pending review';
-      case 'in-progress':
-        return 'Review in progress';
-      case 'completed':
-        return 'Review completed';
-      case 'failed':
-        return 'Review failed';
-      default:
-        return '';
-    }
-  };
+  // const getStatusText = () => {
+  //   switch (reviewStatus) {
+  //     case 'pending':
+  //       return 'Pending review';
+  //     case 'in-progress':
+  //       return 'Review in progress';
+  //     case 'completed':
+  //       return 'Review completed';
+  //     case 'failed':
+  //       return 'Review failed';
+  //     default:
+  //       return '';
+  //   }
+  // };
 
   return (
     <div className="grid place-items-center min-h-screen bg-primary-foreground p-4">
@@ -225,7 +225,7 @@ export function CodeTextarea() {
               {getStatusIcon()}
               <h2 className="font-semibold">Review Status</h2>
             </div>
-            <p className="mb-3">{getStatusText()}</p>
+            <p className="mb-3">{error}</p>
           </div>)}
           {reviewStatus === 'completed' && reviewResult && (
           <div className="mt-4 p-4 bg-green-50 rounded-md border border-green-200">
@@ -295,6 +295,7 @@ export function CodeTextarea() {
           
         )}
       </div>
+      <Toaster />
     </div>
   );
 }
