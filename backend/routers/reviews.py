@@ -36,6 +36,18 @@ class ProgrammingLanguage(str, Enum):
     GO = "go"
     RUST = "rust"
     TYPESCRIPT = "typescript"
+    PHP = "php"
+    RUBY = "ruby"
+    SWIFT = "swift"
+    KOTLIN = "kotlin"
+    HTML = "html"
+    CSS = "css"
+    SQL = "sql"
+    JSON = "json"
+    XML = "xml"
+    YAML = "yaml"
+    MARKDOWN = "markdown"
+    BASH = "bash"
 
 class SubmitReviewRequest(BaseModel):
     code: str = Field(..., min_length=1, max_length=10000, description="The code to review")
